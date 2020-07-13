@@ -1,6 +1,6 @@
 import os
 import re
-from datetime import datetime
+
 
 from flask import Flask, request, abort, jsonify
 from flask.logging import create_logger 
@@ -30,11 +30,11 @@ from linebot.models import (
 import psycopg2
 
 #DATABASE
-connection = psycopg2.connect(user="svnvojzabgxkgu",
-                              password="04eda3e5ffd827b25b1800a4898b71e048beb162f0d5b3ff9425b513284f34b7",
-                              host="ec2-52-86-33-50.compute-1.amazonaws.com",
+connection = psycopg2.connect(user="uigronqdtlgfgy",
+                              password="a35b4e9e8ed6798ee17180222a67fd77fe9109fac5163cefd5b20ac405894e96",
+                              host="ec2-52-207-25-133.compute-1.amazonaws.com",
                               port="5432",
-                              database="d2cu9ok1h3c59n")
+                              database="d9npil276i06um")
 cursor = connection.cursor()
 
 #app
@@ -91,18 +91,6 @@ def handle_message(event):
     #data  
     msg = (event.message.text).lower()
     profile = line_bot_api.get_profile(event.source.user_id)
-    gedung_kuliah = ['labtek', 'lfm', 'oktagon', 'tvst', 'gku barat', 'gku timur', 'labtek v', 'labtek 5', 'labtek vi', 'labtek 6', 'labtek i', 'labtek 1', 'bsc', 'gedung doping', 'doping', 'crcs', 'cas', 'cadl'] 
-    
-    #mencari nama gedung/tempat
-    for i in range(len(gedung_kuliah)):
-        x = re.search(gedung_kuliah[i], msg)
-        if x == None :
-            continue
-        else :
-            lokasi = x.group()
-    # data waktu
-    dates =  (datetime.fromtimestamp(event.timestamp)).strftime("%d/%m/%Y, %H:%M:%S")
-
     if ('hai' in msg) or ('hello' in msg) or ('hai' in msg) or ('hi' in msg) or ('halo' in msg) :
         line_bot_api.reply_message(
             event.reply_token,
@@ -125,7 +113,7 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, template_message)
         #insert data into database
         postgres_insert_query = """ INSERT INTO public.user_profile (user_id, "line_displayName", email) VALUES (%s,%s,%s)"""
-        record_to_insert = (event.source.user_id, profile.display_name, msg, lokasi, dates)
+        record_to_insert = (event.source.user_id, profile.display_name, msg)
         cursor.execute(postgres_insert_query, record_to_insert)
         connection.commit()
  
@@ -135,8 +123,8 @@ def handle_message(event):
             TextSendMessage(text='Terimakasih atas waktunya, data berhasil disimpan'))
 
         #insert data into database
-        postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, teks_komplain, lokasi, waktu_komplain) VALUES (%s,%s,%s,%s,%s)"""
-        record_to_insert = (event.source.user_id, event.message.id, msg, lokasi, dates)
+        postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, teks_komplain) VALUES (%s,%s,%s)"""
+        record_to_insert = (event.source.user_id, event.message.id, msg)
         cursor.execute(postgres_insert_query, record_to_insert)
         connection.commit()
     
