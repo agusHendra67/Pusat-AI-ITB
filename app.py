@@ -118,30 +118,32 @@ def handle_message(event):
         connection.commit()
  
     else :
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text='Terimakasih atas waktunya, data berhasil disimpan'))
+
         #lokasi
+        
         gdg_kuliah = ['labtek','lfm', 'oktagon', 'tvst', 'gku', 'gku barat', 'gku timur', 'labtek v', 'labtek 5', 'labtek vi', 'labtek 6', 'labtek i', 'labtek 1', 'bsc', 'gedung doping', 'doping', 'crcs', 'cas', 'cadl']
-        a = []
+        a = ["0"]
         for i in range(len(gdg_kuliah)):
             x = re.search(gdg_kuliah[i], msg)
         if x == None:
             pass
         else:
-            a.append(x.group())
-        lokasi = a[-1]
+            a[0] = (gdg_kuliah[i])
+        lokasi = a[0]
         #waktu
-        waktu = (datetime.fromtimestamp(event.timestamp)).strftime("%m/%d/%Y, %H:%M:%S")
+        # waktu = (datetime.fromtimestamp(event.timestamp)).strftime("%m/%d/%Y, %H:%M:%S")
                    
 
         #insert data into database
-        postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, teks_komplain, lokasi, waktu_komplain) VALUES (%s,%s,%s,%s,%s)"""
-        record_to_insert = (event.source.user_id, event.message.id, msg, lokasi, waktu)
+        postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, teks_komplain, lokasi) VALUES (%s,%s,%s,%s)"""
+        record_to_insert = (event.source.user_id, event.message.id, msg, lokasi)
         cursor.execute(postgres_insert_query, record_to_insert)
         connection.commit()
 
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text='Terimakasih atas waktunya, data berhasil disimpan'))
-
+        
             
 @handler.add(MessageEvent, message=(ImageMessage))
 def handle_message_image(event):
