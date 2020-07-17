@@ -99,7 +99,7 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text='Silahkan masukkan email'))  
-    elif re.findall(".com$", msg) or re.findall(".co.id$", msg) or re.findall(".org$", msg):
+    elif re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+\.[a-z]+",msg):
         buttons_template = ButtonsTemplate( 
         text='Halo {}, silahkan masukkan data dibawah ya :)'.format(profile.display_name),
         thumbnail_image_url='https://cdn.idntimes.com/content-images/community/2017/09/itb-d41de4ef55a5584eb4de86cdd085cc2d_600x400.jpg', 
@@ -116,7 +116,14 @@ def handle_message(event):
         record_to_insert = (event.source.user_id, profile.display_name, msg)
         cursor.execute(postgres_insert_query, record_to_insert)
         connection.commit()
- 
+    elif line_bot_api.reply_message.__getattribute__.messages == "Silahkan masukkan email" and not(re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+\.[a-z]+",msg)) :
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text='Email yang anda masukkan salah, coba masukkan kembali'))  
+    elif line_bot_api.reply_message.__getattribute__.messages == "Email yang anda masukkan salah, coba masukkan kembali" and not(re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+\.[a-z]+",msg)) :
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text='Email yang anda masukkan salah, coba masukkan kembali'))
     else :
         line_bot_api.reply_message(
             event.reply_token,
