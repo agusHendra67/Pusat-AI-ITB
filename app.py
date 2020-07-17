@@ -135,10 +135,12 @@ def handle_message(event):
 
         #waktu
         waktu = (datetime.fromtimestamp(event.timestamp/1e3)).strftime("%m/%d/%Y, %H:%M:%S")
-          
+        #gambar
+        img = (line_bot_api.get_message_content(event.message_id)).content()
+
         #insert data into database
-        postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, teks_komplain, lokasi, waktu_komplain) VALUES (%s,%s,%s,%s,%s)"""
-        record_to_insert = (event.source.user_id, event.message.id, msg, lokasi, waktu)
+        postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, teks_komplain, lokasi, waktu_komplain, gambar) VALUES (%s,%s,%s,%s,%s,%s)"""
+        record_to_insert = (event.source.user_id, event.message.id, msg, lokasi, waktu, img)
         cursor.execute(postgres_insert_query, record_to_insert)
         connection.commit()
 
@@ -147,17 +149,17 @@ def handle_message(event):
 @handler.add(MessageEvent, message=(ImageMessage))
 def handle_message_image(event):
     # img = (line_bot_api.get_message_content(event.message_id)).content()
-    waktu = (datetime.fromtimestamp(event.timestamp/1e3)).strftime("%m/%d/%Y, %H:%M:%S")
+    # waktu = (datetime.fromtimestamp(event.timestamp/1e3)).strftime("%m/%d/%Y, %H:%M:%S")
 
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text='Terimakasih atas waktunya, gambar berhasil disimpan'))
 
-    #insert database
-    postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, waktu_komplain) VALUES (%s,%s,%s,%s)"""
-    record_to_insert = (event.source.user_id, event.message.id, waktu)
-    cursor.execute(postgres_insert_query, record_to_insert)
-    connection.commit()
+    # #insert database
+    # postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, waktu_komplain) VALUES (%s,%s,%s,%s)"""
+    # record_to_insert = (event.source.user_id, event.message.id, waktu)
+    # cursor.execute(postgres_insert_query, record_to_insert)
+    # connection.commit()
 
         
 
