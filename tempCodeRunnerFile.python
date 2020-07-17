@@ -3,7 +3,7 @@ from datetime import datetime
 import re
 
 waktu = (datetime.fromtimestamp(1462629479859/ 1e3)).strftime("%m/%d/%Y, %H:%M:%S")
-msg = "dinginnn"
+msg = "tvst dinginnn"
 gdg_kuliah = ['labtek','lfm', 'oktagon', 'tvst', 'gku', 'gku barat', 'gku timur', 'labtek v', 'labtek 5', 'labtek vi', 'labtek 6', 'labtek i', 'labtek 1', 'bsc', 'gedung doping', 'doping', 'crcs', 'cas', 'cadl']
 a = ["0"]
 for i in range(len(gdg_kuliah)):
@@ -12,7 +12,7 @@ for i in range(len(gdg_kuliah)):
         pass
     else:
         a[0] = gdg_kuliah[i]
-    lokasi = a[0]
+lokasi = a[0]
 print(lokasi)
 
 # #DATABASE
