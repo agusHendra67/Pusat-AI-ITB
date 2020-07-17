@@ -1,6 +1,6 @@
 import os
 import re
-from datetime import datetime, timezone
+from datetime import datetime
 
 from flask import Flask, request, abort, jsonify
 from flask.logging import create_logger 
@@ -134,7 +134,7 @@ def handle_message(event):
         lokasi = a[0]
 
         #waktu
-        waktu = (datetime.fromtimestamp(event.timestamp/1e3).replace(tzinfo=timezone.utc).astimezone(tz=None)).strftime("%m/%d/%Y, %H:%M:%S")
+        waktu = (datetime.fromtimestamp(event.timestamp/1e3)).strftime("%m/%d/%Y, %H:%M:%S")
           
         #insert data into database
         postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, teks_komplain, lokasi, waktu_komplain) VALUES (%s,%s,%s,%s,%s)"""
