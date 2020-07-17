@@ -99,8 +99,6 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text='Silahkan masukkan email'))  
-        
-        a = 'Silahkan masukkan email'
     elif re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+\.[a-z]+",msg):
         buttons_template = ButtonsTemplate( 
         text='Halo {}, silahkan masukkan data dibawah ya :)'.format(profile.display_name),
@@ -118,15 +116,6 @@ def handle_message(event):
         record_to_insert = (event.source.user_id, profile.display_name, msg)
         cursor.execute(postgres_insert_query, record_to_insert)
         connection.commit()
-    elif a == 'Silahkan masukkan email' and not(re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+\.[a-z]+",msg)) :
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text='Email yang anda masukkan salah, coba masukkan kembali'))  
-        a = "Email yang anda masukkan salah, coba masukkan kembali"
-    elif a == "Email yang anda masukkan salah, coba masukkan kembali" and not(re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+\.[a-z]+",msg)) :
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text='Email yang anda masukkan salah, coba masukkan kembali'))
     else :
         line_bot_api.reply_message(
             event.reply_token,
@@ -144,12 +133,12 @@ def handle_message(event):
         #     a[0] = (gdg_kuliah[i])
         # lokasi = a[0]
         #waktu
-        # waktu = (datetime.fromtimestamp(event.timestamp)).strftime("%m/%d/%Y, %H:%M:%S")
+        waktu = (datetime.fromtimestamp(event.timestamp)).strftime("%m/%d/%Y, %H:%M:%S")
                    
 
         #insert data into database
-        postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, teks_komplain) VALUES (%s,%s,%s)"""
-        record_to_insert = (event.source.user_id, event.message.id, msg)
+        postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, teks_komplain, waktu_komplain) VALUES (%s,%s,%s.%s)"""
+        record_to_insert = (event.source.user_id, event.message.id, msg, waktu)
         cursor.execute(postgres_insert_query, record_to_insert)
         connection.commit()
 
