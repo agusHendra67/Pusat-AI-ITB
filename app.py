@@ -135,7 +135,7 @@ def handle_message(event):
         # lokasi = a[0]
         #waktu
         waktu = (datetime.fromtimestamp(event.timestamp)).strftime("%m/%d/%Y, %H:%M:%S")
-                   
+          
 
         #insert data into database
         postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, teks_komplain, waktu_komplain) VALUES (%s,%s,%s,%s)"""
