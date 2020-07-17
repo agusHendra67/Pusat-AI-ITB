@@ -132,13 +132,13 @@ def handle_message(event):
         else:
             a[0] = (gdg_kuliah[i])
         lokasi = a[0]
-        
+
         #waktu
         waktu = (datetime.fromtimestamp(event.timestamp/1e3)).strftime("%m/%d/%Y, %H:%M:%S")
           
 
         #insert data into database
-        postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, teks_komplain, lokasi, waktu_komplain) VALUES (%s,%s,%s,%s)"""
+        postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, teks_komplain, lokasi, waktu_komplain) VALUES (%s,%s,%s,%s,%s)"""
         record_to_insert = (event.source.user_id, event.message.id, msg, lokasi, waktu)
         cursor.execute(postgres_insert_query, record_to_insert)
         connection.commit()
