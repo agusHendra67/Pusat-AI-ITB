@@ -130,7 +130,7 @@ def handle_message(event):
             if x == None:
                 pass
             else:
-                a[0] = (gdg_kuliah[i])
+                a[0] = gdg_kuliah[i]
                 lokasi = a[0]
 
         #waktu
@@ -147,14 +147,14 @@ def handle_message(event):
             
 @handler.add(MessageEvent, message=(ImageMessage))
 def handle_message_image(event):
-        # img = line_bot_api.get_message_content(event.message_id)
-        # waktu = (datetime.fromtimestamp(event.timestamp)).strftime("%m/%d/%Y, %H:%M:%S")
+        img = line_bot_api.get_message_content(event.message_id)
+        waktu = (datetime.fromtimestamp(event.timestamp/1e3)).strftime("%m/%d/%Y, %H:%M:%S")
 
-        # #insert database
-        # postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, waktu_komplain, gambar) VALUES (%s,%s,%s,%s)"""
-        # record_to_insert = (event.source.user_id, event.message.id, waktu, psycopg2.(img))
-        # cursor.execute(postgres_insert_query, record_to_insert)
-        # connection.commit()
+        #insert database
+        postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, waktu_komplain, gambar) VALUES (%s,%s,%s,%s)"""
+        record_to_insert = (event.source.user_id, event.message.id, waktu, psycopg2.Binary(img))
+        cursor.execute(postgres_insert_query, record_to_insert)
+        connection.commit()
 
         line_bot_api.reply_message(
             event.reply_token,
