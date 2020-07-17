@@ -99,7 +99,7 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text='Silahkan masukkan email'))  
-    elif re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+\.[a-z]+",msg):
+    elif re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+\.[a-z]+",msg) or re.findall(".com$", msg) or re.findall(".co.id$", msg) or re.findall(".org$", msg):
         buttons_template = ButtonsTemplate( 
         text='Halo {}, silahkan masukkan data dibawah ya :)'.format(profile.display_name),
         thumbnail_image_url='https://cdn.idntimes.com/content-images/community/2017/09/itb-d41de4ef55a5584eb4de86cdd085cc2d_600x400.jpg', 
@@ -116,6 +116,7 @@ def handle_message(event):
         record_to_insert = (event.source.user_id, profile.display_name, msg)
         cursor.execute(postgres_insert_query, record_to_insert)
         connection.commit()
+ 
     else :
         line_bot_api.reply_message(
             event.reply_token,
@@ -137,7 +138,7 @@ def handle_message(event):
                    
 
         #insert data into database
-        postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, teks_komplain, waktu_komplain) VALUES (%s,%s,%s.%s)"""
+        postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, teks_komplain, waktu_komplain) VALUES (%s,%s,%s,%s)"""
         record_to_insert = (event.source.user_id, event.message.id, msg, waktu)
         cursor.execute(postgres_insert_query, record_to_insert)
         connection.commit()
