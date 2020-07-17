@@ -155,7 +155,7 @@ def handle_message_image(event):
     waktu = (datetime.fromtimestamp(event.timestamp/1e3)).strftime("%m/%d/%Y, %H:%M:%S")
 
     # #insert database
-    postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, waktu_komplain) VALUES (%s,%s,%s,%s)"""
+    postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, waktu_komplain) VALUES (%s,%s,%s)"""
     record_to_insert = (event.source.user_id, event.message.id, waktu)
     cursor.execute(postgres_insert_query, record_to_insert)
     connection.commit()
