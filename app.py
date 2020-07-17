@@ -127,11 +127,11 @@ def handle_message(event):
         a = ["0"]
         for i in range(len(gdg_kuliah)):
             x = re.search(gdg_kuliah[i], msg)
-        if x == None:
-            pass
-        else:
-            a[0] = (gdg_kuliah[i])
-        lokasi = a[0]
+            if x == None:
+                pass
+            else:
+                a[0] = (gdg_kuliah[i])
+                lokasi = a[0]
 
         #waktu
         waktu = (datetime.fromtimestamp(event.timestamp/1e3)).strftime("%m/%d/%Y, %H:%M:%S")
