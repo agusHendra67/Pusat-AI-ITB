@@ -116,11 +116,11 @@ def handle_message(event):
         record_to_insert = (event.source.user_id, profile.display_name, msg)
         cursor.execute(postgres_insert_query, record_to_insert)
         connection.commit()
-    elif line_bot_api.reply_message.__getattribute__.messages == "Silahkan masukkan email" and not(re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+\.[a-z]+",msg)) :
+    elif line_bot_api.reply_message.__getattribute__.messages[0] == "Silahkan masukkan email" and not(re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+\.[a-z]+",msg)) :
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text='Email yang anda masukkan salah, coba masukkan kembali'))  
-    elif line_bot_api.reply_message.__getattribute__.messages == "Email yang anda masukkan salah, coba masukkan kembali" and not(re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+\.[a-z]+",msg)) :
+    elif line_bot_api.reply_message.__getattribute__.messages[0] == "Email yang anda masukkan salah, coba masukkan kembali" and not(re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+\.[a-z]+",msg)) :
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text='Email yang anda masukkan salah, coba masukkan kembali'))
