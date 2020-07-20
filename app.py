@@ -102,10 +102,10 @@ def handle_message(event):
             TextSendMessage(text='Silahkan masukkan email'))  
     elif re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+\.[a-z]+",msg) or re.findall(".com$", msg) or re.findall(".co.id$", msg) or re.findall(".org$", msg):
         buttons_template = ButtonsTemplate( 
-        text='Halo {}, silahkan masukkan data dibawah ya :)\n *wajib diisi'.format(profile.display_name),
+        text='Halo {}, silahkan masukkan data dibawah ya :)'.format(profile.display_name),
         thumbnail_image_url='https://cdn.idntimes.com/content-images/community/2017/09/itb-d41de4ef55a5584eb4de86cdd085cc2d_600x400.jpg', 
         actions=[
-            PostbackAction(label='Komplain*', data='1'),
+            PostbackAction(label='Komplain', data='1'),
             PostbackAction(label='Lokasi', data='2'),
             PostbackAction(label='Foto/gambar', data='3'),
             ])
