@@ -89,17 +89,12 @@ def handle_postback(event):
             TextSendMessage(text='Silahkan masukkan data gambar'))
     
 #Even saat user mengirim pesan
-@handler.add(MessageEvent, message=(TextMessage, ImageMessage))
+@handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     #teks 
     msg = (event.message.text).lower()
     #user profile
     profile = line_bot_api.get_profile(event.source.user_id)
-    #gambar
-    try :
-        img = line_bot_api.get_message_content(event.message.id).content
-    except :
-        img = None
     #nama gedung kuliah
     gdg_kuliah = ['labtek','lfm', 'oktagon', 'tvst', 'gku', 'gku barat', 'gku timur', 'labtek v', 'labtek 5', 'labtek vi', 'labtek 6', 'labtek i', 'labtek 1', 'bsc', 'gedung doping', 'doping', 'crcs', 'cas', 'cadl']
     
@@ -113,7 +108,7 @@ def handle_message(event):
         thumbnail_image_url='https://cdn.idntimes.com/content-images/community/2017/09/itb-d41de4ef55a5584eb4de86cdd085cc2d_600x400.jpg', 
         actions=[
             PostbackAction(label='Komplain*', data='1'),
-            PostbackAction(label='Lokasi', data='2'),
+            PostbackAction(label='Lokasi*', data='2'),
             PostbackAction(label='Foto/gambar', data='3'),
             ])
         template_message = TemplateSendMessage(
@@ -148,8 +143,8 @@ def handle_message(event):
         waktu = (datetime.fromtimestamp(event.timestamp/1e3).astimezone(tz= pytz.timezone('Asia/Jakarta'))).strftime("%m/%d/%Y, %H:%M:%S")
           
         #insert data into database
-        postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, teks_komplain, lokasi, waktu_komplain, gambar) VALUES (%s,%s,%s,%s,%s,%s)"""
-        record_to_insert = (event.source.user_id, event.message.id, msg, lokasi, waktu, img)
+        postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, teks_komplain, lokasi, waktu_komplain) VALUES (%s,%s,%s,%s,%s)"""
+        record_to_insert = (event.source.user_id, event.message.id, msg, lokasi, waktu)
         cursor.execute(postgres_insert_query, record_to_insert)
         connection.commit()
 
@@ -157,18 +152,24 @@ def handle_message(event):
 #  Even saat user mengirim pesan gambar           
 @handler.add(MessageEvent, message=(ImageMessage))
 def handle_message_image(event):
-#     img = (line_bot_api.get_message_content(event.message_id)).content()
-#     waktu = (datetime.fromtimestamp(event.timestamp/1e3)).strftime("%m/%d/%Y, %H:%M:%S")
+    #gambar
+    try :
+        img = line_bot_api.get_message_content(event.message.id).content()
+    except :
+        img = None
+
+    #waktu
+    waktu = (datetime.fromtimestamp(event.timestamp/1e3).astimezone(tz= pytz.timezone('Asia/Jakarta'))).strftime("%m/%d/%Y, %H:%M:%S")
 
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text='Terimakasih atas waktunya, gambar berhasil disimpan'))
 
-#     #insert database
-#     postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, waktu_komplain) VALUES (%s,%s,%s,%s)"""
-#     record_to_insert = (event.source.user_id, event.message.id, waktu)
-#     cursor.execute(postgres_insert_query, record_to_insert)
-#     connection.commit()
+    #insert database
+    postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, waktu_komplain, gambar) VALUES (%s,%s,%s,%s)"""
+    record_to_insert = (event.source.user_id, event.message.id, waktu, img)
+    cursor.execute(postgres_insert_query, record_to_insert)
+    connection.commit()
 
         
 
