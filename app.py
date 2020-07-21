@@ -1,6 +1,5 @@
 import os
 import re
-import requests
 from datetime import datetime
 import pytz
 
@@ -120,8 +119,7 @@ def handle_message(event):
         postgres_insert_query = """ INSERT INTO public.user_profile (user_id, "line_displayName", email) VALUES (%s,%s,%s)"""
         record_to_insert = (event.source.user_id, profile.display_name, msg)
         cursor.execute(postgres_insert_query, record_to_insert)
-        connection.commit()
-    
+        connection.commit()  
     elif len(msg) <=7 :
         line_bot_api.reply_message(
             event.reply_token,
