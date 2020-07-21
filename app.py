@@ -145,9 +145,10 @@ def handle_message(event):
 
         #get image as binary 
         try :
-            img = line_bot_api.get_message_content(event.message.id).content()
+            r = requests.get('https://api-data.line.me/v2/bot/message/{}/content'.format(event.message.id), headers={'Authorization' : 'Bearer DhLYkk/1uuQ130naHtlK2g7ebRDqe+OB0rVIGgFXqyRTf3zOCNTdEwYkDbDNOYF7MJNgHK1T21nK7s3Mvy+VboMpODA9uC5LzvqdqzjmtXZrR7+LnA4Wc9RK/rqeKJAbjSVSpz9qbanDOLFJdx6qxwdB04t89/1O/w1cDnyilFU='} )
+            img = r.content
         except :
-            img = None 
+            pass 
 
         #insert data into database
         postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, teks_komplain, lokasi, waktu_komplain, gambar) VALUES (%s,%s,%s,%s,%s,%s)"""
