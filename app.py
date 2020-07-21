@@ -97,7 +97,7 @@ def handle_message(event):
     profile = line_bot_api.get_profile(event.source.user_id)
     #gambar
     try :
-        img = line_bot_api.get_message_content(event.message.id).content()
+        img = line_bot_api.get_message_content(event.message.id).content
     except :
         img = None
     #nama gedung kuliah
@@ -149,7 +149,7 @@ def handle_message(event):
           
         #insert data into database
         postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, teks_komplain, lokasi, waktu_komplain, gambar) VALUES (%s,%s,%s,%s,%s,%s)"""
-        record_to_insert = (event.source.user_id, event.message.id, msg, lokasi, waktu, psycopg2.Binary(img))
+        record_to_insert = (event.source.user_id, event.message.id, msg, lokasi, waktu, img)
         cursor.execute(postgres_insert_query, record_to_insert)
         connection.commit()
 
