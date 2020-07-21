@@ -153,10 +153,10 @@ def handle_message(event):
 @handler.add(MessageEvent, message=(ImageMessage))
 def handle_message_image(event):
     #gambar
-    try :
-        img = line_bot_api.get_message_content(event.message.id)
-    except :
-        img = None
+    # try :
+    #     img = line_bot_api.get_message_content(event.message.id)
+    # except :
+    #     img = None
 
     #waktu
     waktu = (datetime.fromtimestamp(event.timestamp/1e3).astimezone(tz= pytz.timezone('Asia/Jakarta'))).strftime("%m/%d/%Y, %H:%M:%S")
@@ -166,8 +166,8 @@ def handle_message_image(event):
         TextSendMessage(text='Terimakasih atas waktunya, gambar berhasil disimpan'))
 
     #insert database
-    postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, waktu_komplain, gambar) VALUES (%s,%s,%s,%s)"""
-    record_to_insert = (event.source.user_id, event.message.id, waktu, psycopg2.Binary(img))
+    postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, waktu_komplain) VALUES (%s,%s,%s)"""
+    record_to_insert = (event.source.user_id, event.message.id, waktu)
     cursor.execute(postgres_insert_query, record_to_insert)
     connection.commit()
 
