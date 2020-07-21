@@ -2,6 +2,7 @@ import os
 import re
 from datetime import datetime
 import pytz
+import requests
 
 from flask import Flask, request, abort, jsonify
 from flask.logging import create_logger 
@@ -152,11 +153,14 @@ def handle_message(event):
 #  Even saat user mengirim pesan gambar           
 @handler.add(MessageEvent, message=(ImageMessage))
 def handle_message_image(event):
-    #gambar
+    
     # try :
     #     img = line_bot_api.get_message_content(event.message.id)
     # except :
     #     img = None
+    #gambar
+    r = requests.get('https://api-data.line.me/v2/bot/message/{}/content'.format(event.message.id), headers={'Authorization' : 'Bearer DhLYkk/1uuQ130naHtlK2g7ebRDqe+OB0rVIGgFXqyRTf3zOCNTdEwYkDbDNOYF7MJNgHK1T21nK7s3Mvy+VboMpODA9uC5LzvqdqzjmtXZrR7+LnA4Wc9RK/rqeKJAbjSVSpz9qbanDOLFJdx6qxwdB04t89/1O/w1cDnyilFU='} )
+    img = r.content
 
     #waktu
     waktu = (datetime.fromtimestamp(event.timestamp/1e3).astimezone(tz= pytz.timezone('Asia/Jakarta'))).strftime("%m/%d/%Y, %H:%M:%S")
@@ -166,8 +170,8 @@ def handle_message_image(event):
         TextSendMessage(text='Terimakasih atas waktunya, gambar berhasil disimpan'))
 
     #insert database
-    postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, waktu_komplain) VALUES (%s,%s,%s)"""
-    record_to_insert = (event.source.user_id, event.message.id, waktu)
+    postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, waktu_komplain, gambar) VALUES (%s,%s,%s.%s)"""
+    record_to_insert = (event.source.user_id, event.message.id, waktu, psycopg2.Binary(img))
     cursor.execute(postgres_insert_query, record_to_insert)
     connection.commit()
 
