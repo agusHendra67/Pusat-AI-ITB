@@ -96,7 +96,10 @@ def handle_message(event):
     #user profile
     profile = line_bot_api.get_profile(event.source.user_id)
     #gambar
-    img = line_bot_api.get_message_content(event.message.id).content
+    try :
+        img = line_bot_api.get_message_content(event.message.id).content()
+    except :
+        img = None
     
     if msg == "1":
         line_bot_api.reply_message(
