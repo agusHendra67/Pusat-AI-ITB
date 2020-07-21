@@ -154,7 +154,7 @@ def handle_message(event):
 def handle_message_image(event):
     #gambar
     try :
-        img = line_bot_api.get_message_content(event.message.id).content()
+        img = line_bot_api.get_message_content(event.message.id).content
     except :
         img = None
 
