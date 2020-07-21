@@ -145,13 +145,13 @@ def handle_message(event):
 
         #get image as binary 
         try :
-            img = line_bot_api.get_message_content().content()
+            img = line_bot_api.get_message_content(event.message.id).content()
         except :
             img = None 
 
         #insert data into database
         postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, teks_komplain, lokasi, waktu_komplain, gambar) VALUES (%s,%s,%s,%s,%s,%s)"""
-        record_to_insert = (event.source.user_id, event.message.id, msg, lokasi, waktu)
+        record_to_insert = (event.source.user_id, event.message.id, msg, lokasi, waktu, img)
         cursor.execute(postgres_insert_query, record_to_insert)
         connection.commit()
 
