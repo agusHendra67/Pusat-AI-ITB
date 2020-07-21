@@ -2,7 +2,6 @@ import os
 import re
 from datetime import datetime
 import pytz
-import requests
 
 from flask import Flask, request, abort, jsonify
 from flask.logging import create_logger 
