@@ -98,11 +98,12 @@ def handle_message(event):
     #nama gedung kuliah
     gdg_kuliah = ['labtek','lfm', 'oktagon', 'tvst', 'gku', 'gku barat', 'gku timur', 'labtek v', 'labtek 5', 'labtek vi', 'labtek 6', 'labtek i', 'labtek 1', 'bsc', 'gedung doping', 'doping', 'crcs', 'cas', 'cadl']
     
+    #reply messages
     if msg == "1":
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text='Silahkan masukkan email'))  
-    elif re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+\.[a-z]+",msg) or re.findall(".com$", msg) or re.findall(".co.id$", msg) or re.findall(".org$", msg):
+    elif re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+\.[a-z]+",msg):
         buttons_template = ButtonsTemplate( 
         text='Halo {}, silahkan isi data dibawah ya :) *wajib'.format(profile.display_name),
         thumbnail_image_url='https://cdn.idntimes.com/content-images/community/2017/09/itb-d41de4ef55a5584eb4de86cdd085cc2d_600x400.jpg', 
@@ -115,7 +116,7 @@ def handle_message(event):
             alt_text='Buttons alt text', template=buttons_template)
         line_bot_api.reply_message(event.reply_token, template_message)
 
-        #insert data into database
+        #insert profile data into database
         postgres_insert_query = """ INSERT INTO public.user_profile (user_id, "line_displayName", email) VALUES (%s,%s,%s)"""
         record_to_insert = (event.source.user_id, profile.display_name, msg)
         cursor.execute(postgres_insert_query, record_to_insert)
@@ -125,11 +126,12 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text='Selamat datang di Chatbot ITB Care, silakan pilih menu (1/2/3/4/5/6) sbb:\n1. Penyampaian masukan untuk ITB\n2. Tanya informasi fasilitas Sarana Prasarana di ITB \n3. Tanya informasi mengenai Sabuga ITB\n4. Tanya informasi perpustakaan ITB\n5. Tanya informasi Pelayanan Kesehatan ITB\n6. Online booking fasilitas'))
     else :
+        #komplain teks
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text='Terimakasih atas waktunya, data berhasil disimpan'))
 
-        #lokasi
+        #search lokasi
         a = ["0"]
         for i in range(len(gdg_kuliah)):
             x = re.search(gdg_kuliah[i], msg)
@@ -139,10 +141,10 @@ def handle_message(event):
                 a[0] = gdg_kuliah[i]
         lokasi = a[0]
 
-        #waktu
+        #waktu komplain
         waktu = (datetime.fromtimestamp(event.timestamp/1e3).astimezone(tz= pytz.timezone('Asia/Jakarta'))).strftime("%m/%d/%Y, %H:%M:%S")
 
-        #insert data into database
+        #insert complaint data into database
         postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, teks_komplain, lokasi, waktu_komplain) VALUES (%s,%s,%s,%s,%s)"""
         record_to_insert = (event.source.user_id, event.message.id, msg, lokasi, waktu)
         cursor.execute(postgres_insert_query, record_to_insert)
