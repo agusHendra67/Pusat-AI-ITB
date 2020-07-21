@@ -100,6 +100,8 @@ def handle_message(event):
         img = line_bot_api.get_message_content(event.message.id).content()
     except :
         img = None
+    #nama gedung kuliah
+    gdg_kuliah = ['labtek','lfm', 'oktagon', 'tvst', 'gku', 'gku barat', 'gku timur', 'labtek v', 'labtek 5', 'labtek vi', 'labtek 6', 'labtek i', 'labtek 1', 'bsc', 'gedung doping', 'doping', 'crcs', 'cas', 'cadl']
     
     if msg == "1":
         line_bot_api.reply_message(
@@ -123,7 +125,7 @@ def handle_message(event):
         record_to_insert = (event.source.user_id, profile.display_name, msg)
         cursor.execute(postgres_insert_query, record_to_insert)
         connection.commit()  
-    elif len(msg) <=7 :
+    elif len(msg) <=7 and msg not in gdg_kuliah:
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text='Selamat datang di Chatbot ITB Care, silakan pilih menu (1/2/3/4/5/6) sbb:\n1. Penyampaian masukan untuk ITB\n2. Tanya informasi fasilitas Sarana Prasarana di ITB \n3. Tanya informasi mengenai Sabuga ITB\n4. Tanya informasi perpustakaan ITB\n5. Tanya informasi Pelayanan Kesehatan ITB\n6. Online booking fasilitas'))
@@ -133,7 +135,6 @@ def handle_message(event):
             TextSendMessage(text='Terimakasih atas waktunya, data berhasil disimpan'))
 
         #lokasi
-        gdg_kuliah = ['labtek','lfm', 'oktagon', 'tvst', 'gku', 'gku barat', 'gku timur', 'labtek v', 'labtek 5', 'labtek vi', 'labtek 6', 'labtek i', 'labtek 1', 'bsc', 'gedung doping', 'doping', 'crcs', 'cas', 'cadl']
         a = ["0"]
         for i in range(len(gdg_kuliah)):
             x = re.search(gdg_kuliah[i], msg)
@@ -148,7 +149,7 @@ def handle_message(event):
           
         #insert data into database
         postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, teks_komplain, lokasi, waktu_komplain, gambar) VALUES (%s,%s,%s,%s,%s,%s)"""
-        record_to_insert = (event.source.user_id, event.message.id, msg, lokasi, waktu, img)
+        record_to_insert = (event.source.user_id, event.message.id, msg, lokasi, waktu, psycopg2.Binary(img))
         cursor.execute(postgres_insert_query, record_to_insert)
         connection.commit()
 
