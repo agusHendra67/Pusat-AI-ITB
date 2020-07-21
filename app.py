@@ -1,5 +1,6 @@
 import os
 import re
+import requests
 from datetime import datetime
 import pytz
 
@@ -30,7 +31,7 @@ from linebot.models import (
 
 import psycopg2
 
-#DATABASE
+#DATABASE Connection
 connection = psycopg2.connect(user="uigronqdtlgfgy",
                               password="a35b4e9e8ed6798ee17180222a67fd77fe9109fac5163cefd5b20ac405894e96",
                               host="ec2-52-207-25-133.compute-1.amazonaws.com",
@@ -63,7 +64,8 @@ def callback():
         abort(400)
     
     return 'OK'
-    
+
+#Even saat user mem-follow akun PusatAI ITB    
 @handler.add(FollowEvent)
 def handle_message_follow(event):
     profile = line_bot_api.get_profile(event.source.user_id)
@@ -71,6 +73,7 @@ def handle_message_follow(event):
         event.reply_token,
         TextSendMessage(text='Halo {} selamat datang di Chatbot ITB Care, silakan pilih menu (1/2/3/4/5/6) sbb:\n1. Penyampaian masukan untuk ITB\n2. Tanya informasi fasilitas Sarana Prasarana di ITB \n3. Tanya informasi mengenai Sabuga ITB\n4. Tanya informasi perpustakaan ITB\n5. Tanya informasi Pelayanan Kesehatan ITB\n6. Online booking fasilitas'.format(profile.display_name)))
 
+#Even saat user mengklik button
 @handler.add(PostbackEvent)
 def handle_postback(event):
     if event.postback.data == "1":
@@ -86,12 +89,16 @@ def handle_postback(event):
             event.reply_token,
             TextSendMessage(text='Silahkan masukkan data gambar'))
     
-
-@handler.add(MessageEvent, message=TextMessage)
+#Even saat user mengirim pesan
+@handler.add(MessageEvent, message=(TextMessage, ImageMessage))
 def handle_message(event):
-    #data  
+    #teks 
     msg = (event.message.text).lower()
+    #user profile
     profile = line_bot_api.get_profile(event.source.user_id)
+    #gambar
+    img = line_bot_api.get_message_content(event.message.id).content()
+    
     if msg == "1":
         line_bot_api.reply_message(
             event.reply_token,
@@ -108,12 +115,14 @@ def handle_message(event):
         template_message = TemplateSendMessage(
             alt_text='Buttons alt text', template=buttons_template)
         line_bot_api.reply_message(event.reply_token, template_message)
+
         #insert data into database
         postgres_insert_query = """ INSERT INTO public.user_profile (user_id, "line_displayName", email) VALUES (%s,%s,%s)"""
         record_to_insert = (event.source.user_id, profile.display_name, msg)
         cursor.execute(postgres_insert_query, record_to_insert)
         connection.commit()
-    elif ('hai' in msg) or ('hello' in msg) or ('hai' in msg) or ('hi' in msg) or ('halo' in msg) or len(msg) <=7 :
+    
+    elif len(msg) <=7 :
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text='Selamat datang di Chatbot ITB Care, silakan pilih menu (1/2/3/4/5/6) sbb:\n1. Penyampaian masukan untuk ITB\n2. Tanya informasi fasilitas Sarana Prasarana di ITB \n3. Tanya informasi mengenai Sabuga ITB\n4. Tanya informasi perpustakaan ITB\n5. Tanya informasi Pelayanan Kesehatan ITB\n6. Online booking fasilitas'))
@@ -137,27 +146,27 @@ def handle_message(event):
         waktu = (datetime.fromtimestamp(event.timestamp/1e3).astimezone(tz= pytz.timezone('Asia/Jakarta'))).strftime("%m/%d/%Y, %H:%M:%S")
           
         #insert data into database
-        postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, teks_komplain, lokasi, waktu_komplain) VALUES (%s,%s,%s,%s,%s)"""
-        record_to_insert = (event.source.user_id, event.message.id, msg, lokasi, waktu)
+        postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, teks_komplain, lokasi, waktu_komplain, gambar) VALUES (%s,%s,%s,%s,%s,%s)"""
+        record_to_insert = (event.source.user_id, event.message.id, msg, lokasi, waktu, img)
         cursor.execute(postgres_insert_query, record_to_insert)
         connection.commit()
 
         
-            
+#  Even saat user mengirim pesan gambar           
 @handler.add(MessageEvent, message=(ImageMessage))
 def handle_message_image(event):
-    # img = (line_bot_api.get_message_content(event.message_id)).content()
-    # waktu = (datetime.fromtimestamp(event.timestamp/1e3)).strftime("%m/%d/%Y, %H:%M:%S")
+#     img = (line_bot_api.get_message_content(event.message_id)).content()
+#     waktu = (datetime.fromtimestamp(event.timestamp/1e3)).strftime("%m/%d/%Y, %H:%M:%S")
 
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text='Terimakasih atas waktunya, gambar berhasil disimpan'))
 
-    # #insert database
-    # postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, waktu_komplain) VALUES (%s,%s,%s,%s)"""
-    # record_to_insert = (event.source.user_id, event.message.id, waktu)
-    # cursor.execute(postgres_insert_query, record_to_insert)
-    # connection.commit()
+#     #insert database
+#     postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, waktu_komplain) VALUES (%s,%s,%s,%s)"""
+#     record_to_insert = (event.source.user_id, event.message.id, waktu)
+#     cursor.execute(postgres_insert_query, record_to_insert)
+#     connection.commit()
 
         
 
