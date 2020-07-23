@@ -8,11 +8,11 @@ connection = psycopg2.connect(user="uigronqdtlgfgy",
                               database="d9npil276i06um")
 cursor = connection.cursor()
 
-r = requests.get('https://api-data.line.me/v2/bot/message/{}/content'.format('12360038319830'), headers={'Authorization' : 'Bearer DhLYkk/1uuQ130naHtlK2g7ebRDqe+OB0rVIGgFXqyRTf3zOCNTdEwYkDbDNOYF7MJNgHK1T21nK7s3Mvy+VboMpODA9uC5LzvqdqzjmtXZrR7+LnA4Wc9RK/rqeKJAbjSVSpz9qbanDOLFJdx6qxwdB04t89/1O/w1cDnyilFU='} )
+r = requests.get('https://api-data.line.me/v2/bot/message/{}/content'.format('12371467712925'), headers={'Authorization' : 'Bearer DhLYkk/1uuQ130naHtlK2g7ebRDqe+OB0rVIGgFXqyRTf3zOCNTdEwYkDbDNOYF7MJNgHK1T21nK7s3Mvy+VboMpODA9uC5LzvqdqzjmtXZrR7+LnA4Wc9RK/rqeKJAbjSVSpz9qbanDOLFJdx6qxwdB04t89/1O/w1cDnyilFU='} )
 img  = r.content
 
 
 postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, gambar) VALUES (%s,%s,%s)"""
-record_to_insert = ('Uf4cd52ad9107eaadce5392f5fe5635e8', '12359981147877', img)
+record_to_insert = ('Uf4cd52ad9107eaadce5392f5fe5635e8', '12371467712927', img)
 cursor.execute(postgres_insert_query, record_to_insert)
 connection.commit()
