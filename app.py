@@ -171,7 +171,7 @@ def handle_message_image(event):
     
     #insert image into database
     postgres_insert_query = """ INSERT INTO public."Gambar" (id_gambar, user_id, waktu, gambar) VALUES (%s,%s,%s,%s)"""
-    record_to_insert = ('Default',event.source.user_id, waktu, img)
+    record_to_insert = (event.message.id, event.source.user_id, waktu, img)
     cursor.execute(postgres_insert_query, record_to_insert)
     connection.commit()
 

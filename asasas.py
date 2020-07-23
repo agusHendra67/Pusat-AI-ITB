@@ -1,5 +1,6 @@
 import requests
 import psycopg2
+import pandas
 
 connection = psycopg2.connect(user="uigronqdtlgfgy",
                               password="a35b4e9e8ed6798ee17180222a67fd77fe9109fac5163cefd5b20ac405894e96",
@@ -12,7 +13,7 @@ r = requests.get('https://api-data.line.me/v2/bot/message/{}/content'.format('12
 img  = r.content
 
 
-postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, gambar) VALUES (%s,%s,%s)"""
-record_to_insert = ('Uf4cd52ad9107eaadce5392f5fe5635e8', '12371467712927', img)
+postgres_insert_query = """ INSERT INTO public."Gambar" (id_gambar, user_id, waktu, gambar) VALUES (%s,%s,%s,%s)"""
+record_to_insert = (int('1253637181763'),'Uf4cd52ad9107eaadce5392f5fe5635e8', '07/23/2020, 22:23:55', img)
 cursor.execute(postgres_insert_query, record_to_insert)
 connection.commit()
