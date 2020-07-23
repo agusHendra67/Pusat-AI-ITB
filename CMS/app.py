@@ -127,7 +127,7 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text='Selamat datang di Chatbot ITB Care, silakan pilih menu (1/2/3/4/5/6) sbb:\n1. Penyampaian masukan untuk ITB\n2. Tanya informasi fasilitas Sarana Prasarana di ITB \n3. Tanya informasi mengenai Sabuga ITB\n4. Tanya informasi perpustakaan ITB\n5. Tanya informasi Pelayanan Kesehatan ITB\n6. Online booking fasilitas'))
     else :
-        #komplain teks
+        #teks komplain
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text='Terimakasih atas waktunya, data berhasil disimpan'))
