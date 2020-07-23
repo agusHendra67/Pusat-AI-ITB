@@ -165,11 +165,11 @@ def handle_message_image(event):
     # img = r.content
 
     # #waktu
-    # waktu = (datetime.fromtimestamp(event.timestamp/1e3).astimezone(tz= pytz.timezone('Asia/Jakarta'))).strftime("%m/%d/%Y, %H:%M:%S")
+    waktu = (datetime.fromtimestamp(event.timestamp/1e3).astimezone(tz= pytz.timezone('Asia/Jakarta'))).strftime("%m/%d/%Y, %H:%M:%S")
 
     
     #insert image into database
-    postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, waktu_komplain,) VALUES (%s,%s,%s)"""
+    postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, waktu_komplain) VALUES (%s,%s,%s)"""
     record_to_insert = (event.source.user_id, event.message.id, waktu)
     cursor.execute(postgres_insert_query, record_to_insert)
     connection.commit()
