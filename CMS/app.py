@@ -32,11 +32,11 @@ from linebot.models import (
 import psycopg2
 
 #DATABASE Connection
-connection = psycopg2.connect(user="uigronqdtlgfgy",
-                              password="a35b4e9e8ed6798ee17180222a67fd77fe9109fac5163cefd5b20ac405894e96",
-                              host="ec2-52-207-25-133.compute-1.amazonaws.com",
+connection = psycopg2.connect(user="pzssbtkzpmnvub",
+                              password="a772ca28135d8bfac88c7acd3b7d45f57f7a1d3b7498e5ddd66f4f5d4cc998dc",
+                              host="ec2-54-91-178-234.compute-1.amazonaws.com",
                               port="5432",
-                              database="d9npil276i06um")
+                              database="d9h0giveuhud7e")
 cursor = connection.cursor()
 
 #app
@@ -118,7 +118,7 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, template_message)
 
         #insert profile data into database
-        postgres_insert_query = """ INSERT INTO public.user_profile (user_id, "line_displayName", email) VALUES (%s,%s,%s)"""
+        postgres_insert_query = """ INSERT INTO public.user_profile (user_id, "Line_displayName", email) VALUES (%s,%s,%s)"""
         record_to_insert = (event.source.user_id, profile.display_name, msg)
         cursor.execute(postgres_insert_query, record_to_insert)
         connection.commit()  
@@ -146,8 +146,8 @@ def handle_message(event):
         waktu = (datetime.fromtimestamp(event.timestamp/1e3).astimezone(tz= pytz.timezone('Asia/Jakarta'))).strftime("%m/%d/%Y, %H:%M:%S")
 
         #insert complaint data into database
-        postgres_insert_query = """ INSERT INTO public.komplain (user_id, message_id, teks_komplain, lokasi, waktu_komplain) VALUES (%s,%s,%s,%s,%s)"""
-        record_to_insert = (event.source.user_id, event.message.id, msg, lokasi, waktu)
+        postgres_insert_query = """ INSERT INTO public.komplain (message_id, user_id, teks, loc, "time") VALUES (%s,%s,%s,%s,%s)"""
+        record_to_insert = (event.message.id, event.source.user_id, msg, lokasi, waktu)
         cursor.execute(postgres_insert_query, record_to_insert)
         connection.commit()
 
@@ -170,7 +170,7 @@ def handle_message_image(event):
 
     
     #insert image into database
-    postgres_insert_query = """ INSERT INTO public."Gambar" (id_gambar, user_id, waktu, gambar) VALUES (%s,%s,%s,%s)"""
+    postgres_insert_query = """ INSERT INTO public."Image" (id_image, user_id, "time", image) VALUES (%s,%s,%s,%s)"""
     record_to_insert = (event.message.id, event.source.user_id, waktu, img)
     cursor.execute(postgres_insert_query, record_to_insert)
     connection.commit()
