@@ -99,14 +99,39 @@ def handle_message(event):
     #nama gedung kuliah
     gdg_kuliah = ['labtek','lfm', 'oktagon', 'tvst', 'gku', 'gku barat', 'gku timur', 'labtek v', 'labtek 5', 'labtek vi', 'labtek 6', 'labtek i', 'labtek 1', 'bsc', 'gedung doping', 'doping', 'crcs', 'cas', 'cadl']
     
+    #insert profile data into database
+    try :
+        postgres_insert_query = """ INSERT INTO public.user_profile (user_id, "Line_displayName") VALUES (%s,%s)"""
+        record_to_insert = (event.source.user_id, profile.display_name)
+        cursor.execute(postgres_insert_query, record_to_insert)
+        connection.commit()  
+    except (Exception, psycopg2.Error):
+        pass
+    
+    #cek email tidak boleh kosong
+    connection.rollback()
+    cursor.execute("SELECT * FROM public.user_profile WHERE user_id = %s", (event.source.user_id,))
+    connection.commit()
+    rows = cursor.fetchall()
+    for row in rows:
+        if row[2] == None:
+            b = "0"
+        else :
+            b = "1"
+    
+
     #reply messages
-    if msg == "1":
+    if (msg == "1" or msg == "a") and b =="0":
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text='Silahkan masukkan email'))  
-    elif re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+\.[a-z]+",msg):
+    elif msg == "tes":
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text='Halo {} selamat datang di Chatbot ITB Care,\n silakan pilih menu (A/B/C/D/E) sbb: \nA. Penyampaian masukan untuk ITB   \nB. Cek status komplain\nC. Lupa id komplain\nD. Update informasi komplain \nE. Ganti email'.format(profile.display_name)))  
+    elif re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+\.[a-z]+",msg) or ((b == "1") and (msg == "1" or msg == "a")):
         buttons_template = ButtonsTemplate( 
-        text='Halo {}, silahkan isi data dibawah ya :) *wajib'.format(profile.display_name),
+        text='Halo, silahkan isi data dibawah ya :) *wajib diisi',
         thumbnail_image_url='https://cdn.idntimes.com/content-images/community/2017/09/itb-d41de4ef55a5584eb4de86cdd085cc2d_600x400.jpg', 
         actions=[
             PostbackAction(label='Komplain*', data='1'),
@@ -117,20 +142,25 @@ def handle_message(event):
             alt_text='Buttons alt text', template=buttons_template)
         line_bot_api.reply_message(event.reply_token, template_message)
 
-        #insert profile data into database
-        postgres_insert_query = """ INSERT INTO public.user_profile (user_id, "Line_displayName", email) VALUES (%s,%s,%s)"""
-        record_to_insert = (event.source.user_id, profile.display_name, msg)
-        cursor.execute(postgres_insert_query, record_to_insert)
+        #update email from database
+        connection.rollback()
+        postgres_update_query = """ UPDATE public.user_profile set email = %s where user_id = %s"""
+        record_to_update = (msg, event.source.user_id)
+        cursor.execute(postgres_update_query, record_to_update)
         connection.commit()  
     elif len(msg) <=7 and msg not in gdg_kuliah:
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text='Selamat datang di Chatbot ITB Care, silakan pilih menu (1/2/3/4/5/6) sbb:\n1. Penyampaian masukan untuk ITB\n2. Tanya informasi fasilitas Sarana Prasarana di ITB \n3. Tanya informasi mengenai Sabuga ITB\n4. Tanya informasi perpustakaan ITB\n5. Tanya informasi Pelayanan Kesehatan ITB\n6. Online booking fasilitas'))
-    else :
-        #teks komplain
+    elif b == "0" and len(msg) > 7:
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text='Terimakasih atas waktunya, data berhasil disimpan'))
+            TextSendMessage(text='Anda belum memasukkan email, silahkan masukkan terlebih dahulu')) 
+    else :
+        #text complaint
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text='Terimakasih atas waktunya, data berhasil disimpan\n id komplain : {}\n(simpan untuk update informasi komplain)'.format(event.message.id)))
 
         #search lokasi
         a = ["0"]
@@ -146,7 +176,8 @@ def handle_message(event):
         waktu = (datetime.fromtimestamp(event.timestamp/1e3).astimezone(tz= pytz.timezone('Asia/Jakarta'))).strftime("%m/%d/%Y, %H:%M:%S")
 
         #insert complaint data into database
-        postgres_insert_query = """ INSERT INTO public.komplain (message_id, user_id, teks, loc, "time") VALUES (%s,%s,%s,%s,%s)"""
+        connection.rollback()
+        postgres_insert_query = """ INSERT INTO public.complaint (message_id, user_id, teks, loc, "time") VALUES (%s,%s,%s,%s,%s)"""
         record_to_insert = (event.message.id, event.source.user_id, msg, lokasi, waktu)
         cursor.execute(postgres_insert_query, record_to_insert)
         connection.commit()
@@ -170,12 +201,11 @@ def handle_message_image(event):
 
     
     #insert image into database
+    connection.rollback()
     postgres_insert_query = """ INSERT INTO public."Image" (id_image, user_id, "time", image) VALUES (%s,%s,%s,%s)"""
     record_to_insert = (event.message.id, event.source.user_id, waktu, img)
     cursor.execute(postgres_insert_query, record_to_insert)
     connection.commit()
-
-        
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
