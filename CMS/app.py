@@ -96,8 +96,8 @@ def handle_message(event):
     msg = (event.message.text).lower()
     #user profile
     profile = line_bot_api.get_profile(event.source.user_id)
-    #nama gedung kuliah
-    gdg_kuliah = ['labtek','lfm', 'oktagon', 'tvst', 'gku', 'gku barat', 'gku timur', 'labtek v', 'labtek 5', 'labtek vi', 'labtek 6', 'labtek i', 'labtek 1', 'bsc', 'gedung doping', 'doping', 'crcs', 'cas', 'cadl']
+    #list of locations
+    loc = open("gedung kuliah.txt", "r").read().splitlines()
     
     #insert profile data into database
     try :
@@ -135,20 +135,20 @@ def handle_message(event):
         thumbnail_image_url='https://cdn.idntimes.com/content-images/community/2017/09/itb-d41de4ef55a5584eb4de86cdd085cc2d_600x400.jpg', 
         actions=[
             PostbackAction(label='Komplain*', data='1'),
-            PostbackAction(label='Lokasi*', data='2'),
+            PostbackAction(label='Lokasi', data='2'),
             PostbackAction(label='Foto/gambar', data='3'),
             ])
         template_message = TemplateSendMessage(
             alt_text='Buttons alt text', template=buttons_template)
         line_bot_api.reply_message(event.reply_token, template_message)
 
-        #update email from database
+        #update email in database
         connection.rollback()
         postgres_update_query = """ UPDATE public.user_profile set email = %s where user_id = %s"""
         record_to_update = (msg, event.source.user_id)
         cursor.execute(postgres_update_query, record_to_update)
         connection.commit()  
-    elif len(msg) <=7 and msg not in gdg_kuliah:
+    elif len(msg) <=7 and msg not in loc:
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text='Halo {}, selamat datang di Chatbot ITB Care, silakan pilih menu (1/2/3/4/5/6) sbb:\n1. Penyampaian masukan untuk ITB\n2. Tanya informasi fasilitas Sarana Prasarana di ITB \n3. Tanya informasi mengenai Sabuga ITB\n4. Tanya informasi perpustakaan ITB\n5. Tanya informasi Pelayanan Kesehatan ITB'.format(profile.display_name)))
@@ -156,6 +156,17 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text='Anda belum memasukkan email, silahkan masukkan terlebih dahulu')) 
+    elif msg.encode('unicode-escape').decode() in loc:
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text='Terimakasih, data lokasi berhasil disimpan')) 
+       
+        #update loc in database
+        connection.rollback()
+        postgres_update_query = """ UPDATE public.complaint set loc = %s where user_id = %s and loc = %s"""
+        record_to_update = (msg, event.source.user_id, "0")
+        cursor.execute(postgres_update_query, record_to_update)
+        connection.commit()    
     else :
         #text complaint
         line_bot_api.reply_message(
@@ -164,21 +175,21 @@ def handle_message(event):
 
         #search lokasi
         a = ["0"]
-        for i in range(len(gdg_kuliah)):
-            x = re.search(gdg_kuliah[i], msg)
+        for i in range(len(loc)):
+            x = re.search(loc[i], msg)
             if x == None:
                 pass
             else:
-                a[0] = gdg_kuliah[i]
-        lokasi = a[0]
+                a[0] = loc[i]
+        location = a[0]
 
         #waktu komplain
-        waktu = (datetime.fromtimestamp(event.timestamp/1e3).astimezone(tz= pytz.timezone('Asia/Jakarta'))).strftime("%m/%d/%Y, %H:%M:%S")
+        time = (datetime.fromtimestamp(event.timestamp/1e3).astimezone(tz= pytz.timezone('Asia/Jakarta'))).strftime("%m/%d/%Y, %H:%M:%S")
 
         #insert complaint data into database
         connection.rollback()
         postgres_insert_query = """ INSERT INTO public.complaint (message_id, user_id, teks, loc, "time") VALUES (%s,%s,%s,%s,%s)"""
-        record_to_insert = (event.message.id, event.source.user_id, msg, lokasi, waktu)
+        record_to_insert = (event.message.id, event.source.user_id, msg, location, time)
         cursor.execute(postgres_insert_query, record_to_insert)
         connection.commit()
 
@@ -197,13 +208,13 @@ def handle_message_image(event):
     img = r.content
 
     #waktu
-    waktu = (datetime.fromtimestamp(event.timestamp/1e3).astimezone(tz= pytz.timezone('Asia/Jakarta'))).strftime("%m/%d/%Y, %H:%M:%S")
+    time = (datetime.fromtimestamp(event.timestamp/1e3).astimezone(tz= pytz.timezone('Asia/Jakarta'))).strftime("%m/%d/%Y, %H:%M:%S")
 
     
     #insert image into database
     connection.rollback()
     postgres_insert_query = """ INSERT INTO public."Image" (id_image, user_id, "time", image) VALUES (%s,%s,%s,%s)"""
-    record_to_insert = (event.message.id, event.source.user_id, waktu, img)
+    record_to_insert = (event.message.id, event.source.user_id, time, img)
     cursor.execute(postgres_insert_query, record_to_insert)
     connection.commit()
 
