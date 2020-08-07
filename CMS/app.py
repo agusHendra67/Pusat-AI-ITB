@@ -151,7 +151,7 @@ def handle_message(event):
     elif len(msg) <=7 and msg not in gdg_kuliah:
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text='Selamat datang di Chatbot ITB Care, silakan pilih menu (1/2/3/4/5/6) sbb:\n1. Penyampaian masukan untuk ITB\n2. Tanya informasi fasilitas Sarana Prasarana di ITB \n3. Tanya informasi mengenai Sabuga ITB\n4. Tanya informasi perpustakaan ITB\n5. Tanya informasi Pelayanan Kesehatan ITB\n6. Online booking fasilitas'))
+            TextSendMessage(text='Halo {}, selamat datang di Chatbot ITB Care, silakan pilih menu (1/2/3/4/5/6) sbb:\n1. Penyampaian masukan untuk ITB\n2. Tanya informasi fasilitas Sarana Prasarana di ITB \n3. Tanya informasi mengenai Sabuga ITB\n4. Tanya informasi perpustakaan ITB\n5. Tanya informasi Pelayanan Kesehatan ITB'.format(profile.display_name)))
     elif b == "0" and len(msg) > 7:
         line_bot_api.reply_message(
             event.reply_token,
