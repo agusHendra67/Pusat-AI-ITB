@@ -2,6 +2,7 @@ labtek
 lfm
 oktagon
 tvst
+gku
 gku barat
 gku timur
 labtek v
