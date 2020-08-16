@@ -1,11 +1,16 @@
 import os
 import re
+
+#date
 from datetime import datetime
 import pytz
 import requests
 
+#Web application framework
 from flask import Flask, request, abort, jsonify
 from flask.logging import create_logger 
+
+#Line Bot API
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -29,6 +34,7 @@ from linebot.models import (
     SeparatorComponent, QuickReply, QuickReplyButton,
     ImageSendMessage)
 
+#PostgreeSQL Database adapter
 import psycopg2
 
 #DATABASE Connection
@@ -65,7 +71,7 @@ def callback():
     
     return 'OK'
 
-#Even saat user mem-follow akun PusatAI ITB    
+#Event when user following PusatAI ITB account  
 @handler.add(FollowEvent)
 def handle_message_follow(event):
     profile = line_bot_api.get_profile(event.source.user_id)
@@ -73,7 +79,7 @@ def handle_message_follow(event):
         event.reply_token,
         TextSendMessage(text='Halo {} selamat datang di Chatbot ITB Care, silakan pilih menu (1/2/3/4/5/6) sbb:\n1. Penyampaian masukan untuk ITB\n2. Tanya informasi fasilitas Sarana Prasarana di ITB \n3. Tanya informasi mengenai Sabuga ITB\n4. Tanya informasi perpustakaan ITB\n5. Tanya informasi Pelayanan Kesehatan ITB\n6. Online booking fasilitas'.format(profile.display_name)))
 
-#Even saat user mengklik button
+#Event when user click button
 @handler.add(PostbackEvent)
 def handle_postback(event):
     if event.postback.data == "1":
@@ -89,7 +95,7 @@ def handle_postback(event):
             event.reply_token,
             TextSendMessage(text='Silahkan masukkan data gambar'))
     
-#Even saat user mengirim pesan
+#Event when user sending a message
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     #teks 
@@ -108,7 +114,7 @@ def handle_message(event):
     except (Exception, psycopg2.Error):
         pass
     
-    #cek email tidak boleh kosong
+    #email check
     connection.rollback()
     cursor.execute("SELECT * FROM public.user_profile WHERE user_id = %s", (event.source.user_id,))
     connection.commit()
@@ -206,7 +212,7 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text='Terimakasih atas waktunya, data berhasil disimpan\n id komplain : {}\n(simpan untuk update informasi komplain)'.format(event.message.id)))
 
-        #search lokasi
+        #location search from input text
         a = ["0"]
         for i in range(len(loc)):
             x = re.search(loc[i], msg)
@@ -216,7 +222,7 @@ def handle_message(event):
                 a[0] = loc[i]
         location = a[0]
 
-        #waktu komplain
+        #time
         time = (datetime.fromtimestamp(event.timestamp/1e3).astimezone(tz= pytz.timezone('Asia/Jakarta'))).strftime("%m/%d/%Y, %H:%M:%S")
 
         #insert complaint data into database
@@ -227,7 +233,7 @@ def handle_message(event):
         connection.commit()
 
         
-#  Even saat user mengirim pesan gambar           
+#Event when user sending a image message          
 @handler.add(MessageEvent, message=(ImageMessage))
 def handle_message_image(event):
 
@@ -247,7 +253,7 @@ def handle_message_image(event):
     r = requests.get('https://api-data.line.me/v2/bot/message/{}/content'.format(event.message.id), headers={'Authorization' : 'Bearer DhLYkk/1uuQ130naHtlK2g7ebRDqe+OB0rVIGgFXqyRTf3zOCNTdEwYkDbDNOYF7MJNgHK1T21nK7s3Mvy+VboMpODA9uC5LzvqdqzjmtXZrR7+LnA4Wc9RK/rqeKJAbjSVSpz9qbanDOLFJdx6qxwdB04t89/1O/w1cDnyilFU='} )
     img = r.content
 
-    #waktu
+    #time
     time = (datetime.fromtimestamp(event.timestamp/1e3).astimezone(tz= pytz.timezone('Asia/Jakarta'))).strftime("%m/%d/%Y, %H:%M:%S")
 
     #insert image into database
@@ -276,7 +282,7 @@ def handle_message_image(event):
     #time differences
     delta = date2-date1
 ###
-
+    #reply messages
     if b == "0":
         line_bot_api.reply_message(
             event.reply_token,
